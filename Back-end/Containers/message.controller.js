@@ -52,7 +52,7 @@ export const getMessage = async (req, res) => {
             Participants: { $all: [senderId, userToChatId] }
         }).populate("messages");
 
-        res.status(200).json(conversation.messages);
+        res.status(200).json(conversation);
 
     } catch (error) {
         console.log("Error in getMessage controller", error.message);

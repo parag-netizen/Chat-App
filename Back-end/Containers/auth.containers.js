@@ -4,9 +4,10 @@ import generateTokensandCookie from "../Utils/generateToken.js";
 
 export const signup = async (req, res) => {
     try {
-        const { fullname, username, password, confPassword, gender } = req.body;
-
-        if (password != confPassword) {
+        const { fullname, username, password, confirmpassword, gender } = req.body;
+        console.log(password)
+        console.log(confirmpassword)
+        if (password != confirmpassword) {
             return res.status(400).json({ error: "Password and Confirm password do not match" })
         }
 
@@ -27,7 +28,7 @@ export const signup = async (req, res) => {
             fullname,
             username,
             password: hashedPassword,
-            confPassword,
+            confirmpassword,
             gender,
             profilepic: gender === "male" ? Boypic : Girlpic
         })
@@ -77,7 +78,6 @@ export const login = async (req, res) => {
             username: user.username,
             profilePic: user.profilepic
         })
-
     } catch (error) {
         console.log("error in Signup controller", error.message)
         res.status(500).json({ error: "Internal server error" })
