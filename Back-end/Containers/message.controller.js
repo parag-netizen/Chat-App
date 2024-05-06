@@ -1,5 +1,7 @@
+import { getRecieverSocketId } from "../Socket/socket.js";
 import Converse from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
+import { io } from "../Socket/socket.js";
 
 export const sendMessage = async (req, res) => {
     try {
@@ -21,19 +23,23 @@ export const sendMessage = async (req, res) => {
         const newMessage = new Message({
             senderId,
             recieverId,
-            message
+            message,
         })
 
         if (newMessage) {
             conversation.messages.push(newMessage._id);
         }
 
-        //SOCKET IO functionality
-
         //await conversation.save();
         //await newMessage.save();
         await Promise.all([conversation.save(), newMessage.save()])
 
+        //SOCKET IO functionality
+
+        const recieverSocketId = getRecieverSocketId(recieverId)
+        if (recieverSocketId) {
+            io.to(recieverSocketId).emit("newMessage", newMessage)
+        }
         res.status(201).json(newMessage)
 
     } catch (error) {
@@ -49,10 +55,10 @@ export const getMessage = async (req, res) => {
         const senderId = req.user._id;
 
         const conversation = await Converse.findOne({
-            Participants: { $all: [senderId, userToChatId] }
+            Participants: { $all: [senderId, userToChatId] },
         }).populate("messages");
-
-        res.status(200).json(conversation);
+        if (!conversation) return res.status(200).json([])
+        res.status(200).json(conversation.messages);
 
     } catch (error) {
         console.log("Error in getMessage controller", error.message);
