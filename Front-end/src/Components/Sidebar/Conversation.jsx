@@ -2,7 +2,7 @@ import { useSocketContext } from "../../Context/Socketcontext";
 import useConversation from "../../zustand/Useconversation";
 
 const Conversation = ({ conversation, lastIdx }) => {
-
+    console.log(conversation.profilepic)
     const { selectedConversation, setSelectedConversation } = useConversation();
     const isSelected = selectedConversation?._id === conversation._id;
     const { onlineUsers } = useSocketContext();
